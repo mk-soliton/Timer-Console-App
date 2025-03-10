@@ -1,6 +1,6 @@
-## What does this pull request accomplish?
+# Summary
 
-TODO: Include high-level description of the changes in this pull request which issues are fixed. Please also include relevant motivation and context. List any dependencies that are required for this change.
+Provide a brief description of the changes in this pull request. Mention any issues that are fixed and the motivation behind these changes.
 
 ## Type of change
 
@@ -11,25 +11,23 @@ Please delete options that are not relevant.
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
 - [ ] This change requires a documentation update
 
-## Implementation Details
+## Description
 
-TODO: Describe how the change addresses the problem. Consider factors such as complexity, alternative solutions, performance impact, etc. Consider listing files with important changes or comment on them directly in the pull request. 
+Describe the changes made and how they address the problem. Include any relevant details about the implementation and any dependencies added.
 
-## Why should this pull request be merged?
+## Why This Change Should Be Merged
 
-TODO: Justify why the pull request should be a part of the project. 
+Explain why this change is necessary and beneficial for the project.
 
-## What testing has been done?
+## Testing
 
-TODO: Detail what testing has been done to ensure this submission meets requirements. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration
-- [ ] Test A
-- [ ] Test B
+Describe the testing that has been done to ensure the changes work as expected. Include instructions for reproducing the tests.
 
 ## Screenshots
 
 (if applicable)
 
-## Checklist:
+## Checklist
 
 - [ ] My code follows the style guidelines of this project
 - [ ] I have performed a self-review of my own code
@@ -39,4 +37,3 @@ TODO: Detail what testing has been done to ensure this submission meets requirem
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] New and existing unit tests pass locally with my changes
 - [ ] Any dependent changes have been merged and published in downstream modules
-

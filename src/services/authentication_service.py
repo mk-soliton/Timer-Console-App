@@ -7,7 +7,7 @@ It includes functions for user account creation, login, and secure password
 management.
 """
 
-import datetime
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 import bcrypt  # type: ignore
@@ -75,7 +75,7 @@ class AuthenticationService:
         """
         payload = {
             "user_id": user_id,
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=2),
+            "exp": datetime.now(timezone.utc) + timedelta(hours=2),
         }
         return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
 
@@ -107,8 +107,7 @@ class AuthenticationService:
         Returns:
             bool: True if the password is strong, False otherwise.
         """
-        # For this example, the password must be at least 8 characters.
-        return len(password) >= 8
+        return len(password) >= 8 and password.isalnum()
 
     def register_user(self, email: EmailStr, password: str) -> User:
         """Registers a new user by storing hashed credentials in the database.
@@ -131,7 +130,10 @@ class AuthenticationService:
             )
 
         if not self.is_strong_password(password):
-            raise ValueError("Password must be at least 8 characters long.")
+            raise ValueError(
+                "Password must be at least 8 characters long with"
+                "alpha numeric characters."
+            )
 
         hashed_password = self.hash_password(password)
         new_user = User.create(email=email, hashed_password=hashed_password)

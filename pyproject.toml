@@ -11,6 +11,10 @@ python = "^3.9"
 inquirer = "^3.4.0"
 rich = "^13.9.4"
 textual = "^2.1.2"
+pydantic = {extras = ["email"], version = "^2.10.6"}
+bcrypt = "^4.3.0"
+pyjwt = "^2.10.1"
+black = "^25.1.0"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^6.0.0"

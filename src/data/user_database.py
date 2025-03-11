@@ -4,8 +4,8 @@ user_database.py
 This module handles database operations for the User model.
 """
 
-from datetime import datetime
 import sqlite3
+from datetime import datetime
 from sqlite3 import Connection, Error
 from typing import Optional
 
@@ -78,8 +78,12 @@ class UserData:
                     cursor = self.conn.cursor()
                     cursor.execute(
                         insert_user_data_query,
-                        (str(user.id), user.email, user.hashed_password,
-                         user.created_at.isoformat())
+                        (
+                            str(user.id),
+                            user.email,
+                            user.hashed_password,
+                            user.created_at.isoformat(),
+                        ),
                     )
                     self.conn.commit()
         except Error as err:
@@ -110,7 +114,7 @@ class UserData:
                             hashed_password=row["hashed_password"],
                             created_at=datetime.fromisoformat(
                                 row["created_at"]
-                            )
+                            ),
                         )
             return None
         except Error as err:

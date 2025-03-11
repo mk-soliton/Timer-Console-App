@@ -28,7 +28,7 @@ class AuthenticationService:
 
     def __init__(self, db: Optional[UserData] = None) -> None:
         """
-        Initializes the authentication service with a database instance.
+        Initialize the authentication service with a database instance.
 
         Args:
             db (Optional[Database]): A Database instance. If None, a new
@@ -38,7 +38,7 @@ class AuthenticationService:
 
     @staticmethod
     def hash_password(password: str) -> str:
-        """Hashes a password using bcrypt.
+        """Hash a password using bcrypt.
 
         Args:
             password (str): The plain text password.
@@ -51,7 +51,7 @@ class AuthenticationService:
 
     @staticmethod
     def verify_password(password: str, hashed_password: str):
-        """Verifies if the provided password matches the stored hashed
+        """Verify if the provided password matches the stored hashed
         password.
 
         Args:
@@ -65,7 +65,7 @@ class AuthenticationService:
 
     @staticmethod
     def generate_token(user_id: str) -> str:
-        """Generates a JWT authentication token for a user.
+        """Generate a JWT authentication token for a user.
 
         Args:
             user_id (str): The ID of the authenticated user.
@@ -80,26 +80,8 @@ class AuthenticationService:
         return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
 
     @staticmethod
-    def decode_token(token: str) -> Optional[dict]:
-        """Decodes and verifies a JWT authentication token.
-
-        Args:
-            token (str): The JWT token.
-
-        Returns:
-            Optional[dict]: The decoded payload if valid, or None if invalid
-            or expired.
-        """
-        try:
-            return jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-        except jwt.ExpiredSignatureError:  # type: ignore
-            return None
-        except jwt.InvalidTokenError:  # type: ignore
-            return None
-
-    @staticmethod
     def is_strong_password(password: str) -> bool:
-        """Checks if the password meets minimum security requirements.
+        """Check if the password meets minimum security requirements.
 
         Args:
             password (str): The plain text password.
@@ -110,7 +92,7 @@ class AuthenticationService:
         return len(password) >= 8 and password.isalnum()
 
     def register_user(self, email: EmailStr, password: str) -> User:
-        """Registers a new user by storing hashed credentials in the database.
+        """Register a new user by storing hashed credentials in the database.
 
         Args:
             email (EmailStr): The user's validated email address.
@@ -141,7 +123,7 @@ class AuthenticationService:
         return new_user
 
     def login_user(self, email: EmailStr, password: str) -> str:
-        """Authenticates a user and returns a JWT token if successful.
+        """Authenticate a user and returns a JWT token if successful.
 
         Args:
             email (EmailStr): The user's validated email address.

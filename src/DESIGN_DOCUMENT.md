@@ -126,6 +126,7 @@ The application will use local storage for data management, ensuring offline acc
 
 - `users.db`: Stores user IDs and hashed passwords.
 - `tasks.db`: Stores task details, including category and duration.
+- `category.db`: Stores the category field of tasks without duplicates.
 - `timings.db`: Records start and end times for tasks.
 
 **Data Flow:** Data will be read from and written to local databases as users interact with the application.

@@ -14,7 +14,7 @@ import bcrypt  # type: ignore
 import jwt  # type: ignore
 from pydantic import EmailStr
 
-from src.data.user_database import UserData
+from src.data_loader.user_database import UserDatabase
 from src.exceptions.authentication_exceptions import (
     AuthenticationError,
     UserAlreadyExistsError,
@@ -26,7 +26,7 @@ from src.utils.config import SECRET_KEY
 class AuthenticationService:
     """Service class for handling user authentication operations."""
 
-    def __init__(self, db: Optional[UserData] = None) -> None:
+    def __init__(self, db: Optional[UserDatabase] = None) -> None:
         """
         Initialize the authentication service with a database instance.
 
@@ -34,11 +34,12 @@ class AuthenticationService:
             db (Optional[Database]): A Database instance. If None, a new
             instance is created.
         """
-        self.db = db if db is not None else UserData()
+        self.db = db if db is not None else UserDatabase()
 
     @staticmethod
     def hash_password(password: str) -> str:
-        """Hash a password using bcrypt.
+        """
+        Hash the password using bcrypt.
 
         Args:
             password (str): The plain text password.
@@ -50,8 +51,9 @@ class AuthenticationService:
         return bcrypt.hashpw(password.encode(), salt).decode()
 
     @staticmethod
-    def verify_password(password: str, hashed_password: str):
-        """Verify if the provided password matches the stored hashed
+    def verify_password(password: str, hashed_password: str) -> bool:
+        """
+        Verify if the provided password matches the stored hashed
         password.
 
         Args:
@@ -65,7 +67,8 @@ class AuthenticationService:
 
     @staticmethod
     def generate_token(user_id: str) -> str:
-        """Generate a JWT authentication token for a user.
+        """
+        Generate a JWT authentication token for a user.
 
         Args:
             user_id (str): The ID of the authenticated user.
@@ -75,7 +78,7 @@ class AuthenticationService:
         """
         payload = {
             "user_id": user_id,
-            "exp": datetime.now(timezone.utc) + timedelta(hours=2),
+            "expiry": datetime.now(timezone.utc) + timedelta(hours=2),
         }
         return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
 
@@ -98,7 +101,8 @@ class AuthenticationService:
 
     @staticmethod
     def is_strong_password(password: str) -> bool:
-        """Check if the password meets minimum security requirements.
+        """
+        Check if the password meets minimum security requirements.
 
         Args:
             password (str): The plain text password.
@@ -109,7 +113,8 @@ class AuthenticationService:
         return len(password) >= 8 and password.isalnum()
 
     def register_user(self, email: EmailStr, password: str) -> User:
-        """Register a new user by storing hashed credentials in the database.
+        """
+        Register a new user by storing hashed credentials in the database.
 
         Args:
             email (EmailStr): The user's validated email address.

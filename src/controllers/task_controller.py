@@ -35,6 +35,7 @@ class TaskController:
                         "View Tasks",
                         "Create Task",
                         "Delete Task",
+                        "Update Task",
                         "Log out",
                     ],
                 )
@@ -46,6 +47,12 @@ class TaskController:
                 self.view_tasks()
             elif answers["action"] == "Create Task":
                 self.create_task()
+            elif answers["action"] == "Update Task":
+                self.console.print(
+                    "[yellow]Update feature implementation is in progress."
+                    "[/yellow]"
+                )
+                # self.update_task()
             elif answers["action"] == "Delete Task":
                 self.delete_task()
             elif answers["action"] == "Log out":
@@ -60,7 +67,8 @@ class TaskController:
         for task in tasks:
             self.console.print(
                 f"ID: {task.id} | Task: {task.task_name} | "
-                f"Duration: {task.duration} | Category ID: {task.category_id}"
+                f"Duration: {task.duration} | Category: {task.category_name} |"
+                f"Task Status: {task.task_status}"
             )
 
     def create_task(self) -> None:
@@ -83,7 +91,6 @@ class TaskController:
         except ValueError:
             duration = 0.0
 
-        # Ensure category service returns a Category object, extract the name
         category_obj = self.category_service.create_category(category_name)
 
         if not category_obj or not hasattr(category_obj, "name"):
@@ -100,6 +107,28 @@ class TaskController:
         self.console.print(
             f"[green]Task created successfully with ID: {task.id}[/green]"
         )
+
+    def update_task(self) -> None:
+        questions = [
+            inquirer.Text("task_id", message="Enter Task ID to update"),
+            inquirer.Text("category", message="Enter new category"),
+            inquirer.Text("task_name", message="Enter new task/activity name"),
+            inquirer.Text("duration", message="Enter new duration (in hours)"),
+        ]
+        answers = inquirer.prompt(questions)
+        if not answers:
+            return
+        try:
+            task_id = int(answers["task_id"])
+            category_name = answers["category"]
+            task_name = answers["task_name"]
+            duration = float(answers["duration"])
+            self.task_service.update_task(
+                self.user_id, task_id, category_name, task_name, duration
+            )
+            self.console.print("[green]Task updated successfully.[/green]")
+        except ValueError:
+            self.console.print("[red]Invalid Task ID or duration.[/red]")
 
     def delete_task(self) -> None:
         questions = [

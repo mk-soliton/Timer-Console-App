@@ -37,18 +37,17 @@ class TaskService:
         """Create a new task, ensuring category exists."""
         category = self.category_db.get_or_create_category(category_name)
 
-        if not category or category.id is None:
+        if category is None:
             raise ValueError(
                 f"Category '{category_name}' could not be created/retrieved."
             )
 
-        category_id: int = category.id  # Ensure category_id is always an int
-
         new_task = Task.create(
             user_id=user_id,
-            category_id=category_id,  # Now guaranteed to be int
+            category_name=category_name,
             task_name=task_name,
             duration=duration,
+            task_status="not started",
         )
 
         self.task_db.save_task(new_task)
@@ -57,6 +56,18 @@ class TaskService:
     def get_tasks(self, user_id: int) -> List[Task]:
         """Retrieve all tasks for a given user."""
         return self.task_db.get_tasks_by_user(user_id)
+
+    def update_task(
+        self,
+        user_id: int,
+        task_id: int,
+        category_name: str,
+        task_name: str,
+        duration: float,
+    ) -> None:
+        """Update a task's duration by task ID for the given user."""
+        self.task_db.update_task(user_id, task_id, task_name, duration)
+        self.category_db.get_or_create_category(category_name)
 
     def delete_task(self, user_id: int, task_id: int) -> None:
         """Delete a task by task ID for the given user."""

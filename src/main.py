@@ -9,6 +9,9 @@ from rich.console import Console
 from rich.panel import Panel
 
 from src.controllers.authentication_controller import AuthenticationController
+from src.controllers.task_controller import TaskController
+from src.services.category_service import CategoryService
+from src.services.task_service import TaskService
 
 # Create a Rich console instance
 console = Console()
@@ -17,6 +20,8 @@ console = Console()
 def main() -> None:
     """Run main function to handle authentication and task management."""
     auth_controller = AuthenticationController()
+    task_service = TaskService()
+    category_service = CategoryService()
     logged_in_user = None
 
     console.print(
@@ -61,7 +66,7 @@ def main() -> None:
                     "[bold green]Login successful."
                     f"Welcome, {logged_in_user.email}![/bold green]"
                 )
-                return
+                continue
 
             elif action == "Exit":
                 console.print(
@@ -69,6 +74,19 @@ def main() -> None:
                     "Goodbye![/bold magenta]"
                 )
                 break
+
+        else:
+            console.print(
+                Panel.fit(
+                    f"[green]Logged in as {logged_in_user.email}[/green]",
+                    title="User Dashboard",
+                )
+            )
+            task_controller = TaskController(
+                logged_in_user.id, task_service, category_service
+            )
+            task_controller.show_menu()
+            logged_in_user = None  # Logout after task operations
 
 
 if __name__ == "__main__":

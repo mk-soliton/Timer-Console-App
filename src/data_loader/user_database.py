@@ -14,7 +14,7 @@ from pydantic import EmailStr
 from src.models.user import User
 
 
-class UserData:
+class UserDatabase:
     """
     User database operations.
 
@@ -45,7 +45,7 @@ class UserData:
         """Create the users table if it does not already exist."""
         create_table_query = """
         CREATE TABLE IF NOT EXISTS users (
-            id TEXT PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             email TEXT UNIQUE NOT NULL,
             hashed_password TEXT NOT NULL,
             created_at TEXT NOT NULL

@@ -80,6 +80,23 @@ class AuthenticationService:
         return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
 
     @staticmethod
+    def decode_token(token: str) -> Optional[dict]:
+        """Decode and verify a JWT authentication token.
+
+        Args:
+            token (str): The JWT token string.
+
+        Returns:
+            Optional[dict]: The decoded token payload if valid, None otherwise.
+        """
+        try:
+            return jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        except jwt.ExpiredSignatureError:
+            return None
+        except jwt.InvalidTokenError:
+            return None
+
+    @staticmethod
     def is_strong_password(password: str) -> bool:
         """Check if the password meets minimum security requirements.
 

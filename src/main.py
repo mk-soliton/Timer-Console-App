@@ -47,19 +47,21 @@ def main() -> None:
 
             elif action == "Login":
                 result = auth_controller.login_user()
-                if (
-                    result is None
-                ):  # If login_user() returned None, exit or handle accordingly
+                if result is None:
                     console.print("[red]Login failed. Please try again.[/red]")
                     continue
 
-                token, logged_in_user = (
-                    result  # Properly unpacking after checking it's not None
+                token, logged_in_user = result
+
+                if logged_in_user is None:
+                    console.print("[red]Login failed. Please try again.[/red]")
+                    continue
+
+                console.print(
+                    "[bold green]Login successful."
+                    f"Welcome, {logged_in_user.email}![/bold green]"
                 )
-
-                if logged_in_user is None:  # Additional safety check
-                    console.print("[red]Login failed. Please try again.[/red]")
-                    continue
+                return
 
             elif action == "Exit":
                 console.print(

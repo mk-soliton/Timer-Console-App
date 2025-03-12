@@ -55,7 +55,7 @@ class AuthenticationService:
     @staticmethod
     def verify_password(password: str, hashed_password: str) -> bool:
         """
-        VerifY password correctness.
+        Verify password correctness.
 
         Verify if the provided password matches the stored hashed password.
 

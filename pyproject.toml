@@ -1,13 +1,20 @@
 [tool.poetry]
-name = "python-starter-repo"
+name = "timer-console-application"
 version = "0.1.0"
 description = ""
 authors = ["Soliton"]
 readme = "README.md"
-packages = [{include = "python-starter-repo"}]
+packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+inquirer = "^3.4.0"
+rich = "^13.9.4"
+textual = "^2.1.2"
+pydantic = {extras = ["email"], version = "^2.10.6"}
+pyjwt = "^2.10.1"
+black = "^25.1.0"
+bcrypt = "4.1.1"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^6.0.0"

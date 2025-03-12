@@ -1,5 +1,9 @@
 """
+<<<<<<< HEAD
 logger.py
+=======
+logger.py module.
+>>>>>>> fa8107a18c7e6959db49ab8996961a36a40f7e0b
 
 This module provides logging functionality for the Time Tracker Console
 Application.

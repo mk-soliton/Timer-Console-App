@@ -90,7 +90,7 @@ class AuthenticationController:
         answers = inquirer.prompt(questions)
         if not answers:
             self.console.print("[red]Login cancelled.[/red]")
-            return None  # Explicitly return None
+            return None
 
         email_input = answers.get("email", "")
         password = answers.get("password", "")
@@ -110,19 +110,17 @@ class AuthenticationController:
             return None
 
         try:
-            token, user = self.auth_service.login_user(
-                email, password
-            )  # Assuming login_user now returns user object
+            token, user = self.auth_service.login_user(email, password)
             self.console.print("[green]Login successful![/green]")
             self.console.print(
                 f"Your JWT token is:\n[bold cyan]{token}[/bold cyan]"
             )
-            return user  # Return the user object
+            return token, user
         except AuthenticationError as e:
             self.console.print(f"[red]Login failed: {e}[/red]")
-            return None
+            return None, None
         except Exception as e:
             self.console.print(
                 f"[red]An unexpected error occurred during login: {e}[/red]"
             )
-            return None
+            return None, None

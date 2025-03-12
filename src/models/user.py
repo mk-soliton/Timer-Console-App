@@ -6,18 +6,16 @@ attributes.
 """
 
 from datetime import datetime, timezone
-from uuid import uuid4
+from typing import Optional
 
-from pydantic import BaseModel, EmailStr  # type: ignore
+from pydantic import BaseModel, EmailStr
 
 
 class User(BaseModel):
-    """
-    User Model for Application.
-
-    Represent a user model in the application using Pydantic for
+    """Represent a user model in the application using Pydantic for
     validation."""
-    id: str
+
+    id: Optional[int] = None
     email: EmailStr
     hashed_password: str
     created_at: datetime
@@ -38,8 +36,7 @@ class User(BaseModel):
             User: A new User instance.
         """
         return cls(
-            id=str(uuid4()),
             email=email,
             hashed_password=hashed_password,
-            created_at=datetime.now(timezone.utc)
+            created_at=datetime.now(timezone.utc),
         )

@@ -35,7 +35,7 @@ class UserDatabase:
 
     def connect(self) -> None:
         """
-        Connects to the SQLite database.
+        Connect to the SQLite database.
 
         Establish a connection to the SQLite database and handle errors,
         if any.
@@ -48,7 +48,7 @@ class UserDatabase:
 
     def create_users_table(self) -> None:
         """
-        Creates users table.
+        Create users table.
 
         Create the users table if it does not already exist and handle errors,
         if any.
@@ -74,7 +74,7 @@ class UserDatabase:
 
     def save_user(self, user: User) -> None:
         """
-        Saves user data.
+        Save user data.
 
         Save a new user to the database and handle errors, if any.
 
@@ -105,7 +105,7 @@ class UserDatabase:
 
     def get_user_by_email(self, email: EmailStr) -> Optional[User]:
         """
-        Retrieves user by email.
+        Retrieve user by email.
 
         Retrieve a user by email from the database and handle errors, if any.
 

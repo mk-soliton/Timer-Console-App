@@ -39,7 +39,7 @@ class AuthenticationService:
     @staticmethod
     def hash_password(password: str) -> str:
         """
-        Hashes password.
+        Hash password.
 
         Hash the password provided by the user using bcrypt.
 
@@ -55,7 +55,7 @@ class AuthenticationService:
     @staticmethod
     def verify_password(password: str, hashed_password: str) -> bool:
         """
-        Verifies password correctness.
+        VerifY password correctness.
 
         Verify if the provided password matches the stored hashed password.
 
@@ -71,7 +71,7 @@ class AuthenticationService:
     @staticmethod
     def generate_token(user_id: str) -> str:
         """
-        Generates a JWT token.
+        Generate a JWT token.
 
         Generate JWT authentication token for a user.
 
@@ -92,7 +92,7 @@ class AuthenticationService:
     @staticmethod
     def decode_token(token: str) -> Optional[dict]:
         """
-        Decodes the JWT token.
+        Decode JWT token.
 
         Decode and verify a JWT authentication token.
 
@@ -126,7 +126,7 @@ class AuthenticationService:
 
     def register_user(self, email: EmailStr, password: str) -> User:
         """
-        Registers a new user.
+        Register a new user.
 
         Register new user by storing hashed credentials in the database.
 

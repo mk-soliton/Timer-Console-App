@@ -22,7 +22,7 @@ class User(BaseModel):
     @classmethod
     def create(cls, email: EmailStr, hashed_password: str) -> "User":
         """
-        Creates new user.
+        Create new user.
 
         Creates a new User instance with a unique UUID, email, hashed password
         and created_at timing.

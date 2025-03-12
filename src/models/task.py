@@ -15,17 +15,19 @@ class Task(BaseModel):
 
     id: Optional[int] = None
     user_id: int
-    category_id: int
+    category_name: str
     task_name: str
-    duration: float = 0.0
+    duration: float
+    task_status: str
 
     @classmethod
     def create(
         cls,
         user_id: int,
-        category_id: int,
+        category_name: str,
         task_name: str,
-        duration: float = 0.0,
+        duration: float,
+        task_status: str,
     ) -> "Task":
         """
         Create new task.
@@ -43,7 +45,8 @@ class Task(BaseModel):
         """
         return cls(
             user_id=user_id,
-            category_id=category_id,
+            category_name=category_name,
             task_name=task_name,
             duration=duration,
+            task_status=task_status,
         )

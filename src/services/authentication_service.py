@@ -139,8 +139,9 @@ class AuthenticationService:
         self.db.save_user(new_user)
         return new_user
 
-    def login_user(self, email: EmailStr, password: str) -> str:
-        """Authenticate a user and returns a JWT token if successful.
+    def login_user(self, email: str, password: str) -> tuple[str, User]:
+        """
+        Authenticate a user and returns a JWT token if successful.
 
         Args:
             email (EmailStr): The user's validated email address.
@@ -151,12 +152,14 @@ class AuthenticationService:
             credentials.
 
         Returns:
-            str: A JWT token if authentication is successful.
+            tuple[str, User]: A JWT token and the user object if
+            authentication is successful.
         """
         user = self.db.get_user_by_email(email)
         if not user or not self.verify_password(
             password, user.hashed_password
         ):
-            raise AuthenticationError("Invalid email or password.")
+            raise AuthenticationError("Invalid credentials")
 
-        return self.generate_token(user.id)
+        token = self.generate_token(str(user.id))
+        return token, user

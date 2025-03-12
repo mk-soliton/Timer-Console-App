@@ -78,7 +78,9 @@ class AuthenticationService:
         """
         payload = {
             "user_id": user_id,
-            "expiry": datetime.now(timezone.utc) + timedelta(hours=2),
+            "expiry": (
+                datetime.now(timezone.utc) + timedelta(hours=2)
+            ).timestamp(),
         }
         return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
 

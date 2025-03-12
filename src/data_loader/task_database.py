@@ -31,20 +31,21 @@ class TaskDatabase:
 
     def create_tasks_table(self) -> None:
         """Creates the tasks table if it doesn't exist."""
-        create_table_sql = """
+        create_table_query = """
         CREATE TABLE IF NOT EXISTS tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
-            category_id INTEGER NOT NULL,
+            category_name TEXT NOT NULL,
             task_name TEXT NOT NULL,
             duration REAL DEFAULT 0,
-            FOREIGN KEY (category_id) REFERENCES categories(id)
+            task_status TEXT DEFAULT 'not started',
+            FOREIGN KEY (category_name) REFERENCES categories(name)
         );
         """
         try:
             if self.conn:
                 cursor = self.conn.cursor()
-                cursor.execute(create_table_sql)
+                cursor.execute(create_table_query)
                 self.conn.commit()
         except Error as err:
             raise Exception(f"Error creating tasks table: {err}")
@@ -52,8 +53,8 @@ class TaskDatabase:
     def save_task(self, task: Task) -> None:
         """Saves a new task into the database."""
         insert_sql = """
-        INSERT INTO tasks (user_id, category_id, task_name, duration)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO tasks (user_id, category_name, task_name, duration,
+        task_status) VALUES (?, ?, ?, ?, ?)
         """
         try:
             if self.conn:
@@ -62,9 +63,10 @@ class TaskDatabase:
                     insert_sql,
                     (
                         task.user_id,
-                        task.category_id,
+                        task.category_name,
                         task.task_name,
                         task.duration,
+                        task.task_status,
                     ),
                 )
                 self.conn.commit()
@@ -83,9 +85,10 @@ class TaskDatabase:
                     Task(
                         id=row["id"],
                         user_id=row["user_id"],
-                        category_id=row["category_id"],
+                        category_name=row["category_name"],
                         task_name=row["task_name"],
                         duration=row["duration"],
+                        task_status=row["task_status"],
                     )
                     for row in rows
                 ]
@@ -93,12 +96,53 @@ class TaskDatabase:
             raise Exception(f"Error retrieving tasks: {err}")
         return []
 
+    def update_task(
+        self,
+        user_id: int,
+        task_id: int,
+        task_name: str,
+        duration: float,
+    ) -> None:
+        """Update a task's category, task name, or duration for the
+        given user."""
+        check_query = "SELECT id FROM tasks WHERE id = ? AND user_id = ?"
+        update_query = """
+        UPDATE tasks
+        SET category_id = ?, task_name = ?, duration = ?
+        WHERE id = ? AND user_id = ?
+        """
+        try:
+            if self.conn:
+                cursor = self.conn.cursor()
+                cursor.execute(check_query, (task_id, user_id))
+                task = cursor.fetchone()
+                if task is None:
+                    raise ValueError(
+                        f"Task with ID {task_id} for user {user_id} "
+                        "does not exist."
+                    )
+                cursor.execute(
+                    update_query,
+                    (task_name, duration, task_id, user_id),
+                )
+                self.conn.commit()
+        except Error as err:
+            raise Exception(f"Error updating task: {err}")
+
     def delete_task(self, user_id: int, task_id: int) -> None:
         """Deletes a task by task ID for the given user."""
+        check_sql = "SELECT id FROM tasks WHERE id = ? AND user_id = ?"
         delete_sql = "DELETE FROM tasks WHERE id = ? AND user_id = ?"
         try:
             if self.conn:
                 cursor = self.conn.cursor()
+                cursor.execute(check_sql, (task_id, user_id))
+                task = cursor.fetchone()
+                if task is None:
+                    raise ValueError(
+                        f"Task with ID {task_id} for user {user_id} "
+                        "does not exist."
+                    )
                 cursor.execute(delete_sql, (task_id, user_id))
                 self.conn.commit()
         except Error as err:

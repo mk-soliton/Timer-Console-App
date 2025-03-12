@@ -33,7 +33,6 @@ class CategoryDatabase:
         """Creates the categories table if it doesn't exist."""
         create_table_sql = """
         CREATE TABLE IF NOT EXISTS categories (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT UNIQUE NOT NULL
         );
         """
@@ -55,11 +54,11 @@ class CategoryDatabase:
                 cursor.execute(select_sql, (name,))
                 row = cursor.fetchone()
                 if row:
-                    return Category(id=row["id"], name=row["name"])
+                    return Category(name=row["name"])
 
                 cursor.execute(insert_sql, (name,))
                 self.conn.commit()
-                return Category(id=cursor.lastrowid, name=name)
+                return Category(name=name)
 
         except Error as e:
             raise Exception(f"Error retrieving or creating category: {e}")
@@ -74,9 +73,7 @@ class CategoryDatabase:
                 cursor = self.conn.cursor()
                 cursor.execute(select_sql)
                 rows = cursor.fetchall()
-                return [
-                    Category(id=row["id"], name=row["name"]) for row in rows
-                ]
+                return [Category(name=row["name"]) for row in rows]
         except Error as e:
             raise Exception(f"Error retrieving categories: {e}")
         return []

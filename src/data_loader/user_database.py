@@ -21,7 +21,7 @@ class UserDatabase:
     Database class to handle user storage using SQLite3.
     """
 
-    def __init__(self, db_path: str = "src/data/database/users.db") -> None:
+    def __init__(self, db_path: str = "src/database/users.db") -> None:
         """
         Initialize the database connection and ensures the users table exists.
 
@@ -69,8 +69,8 @@ class UserDatabase:
             user (User): The user object to be saved.
         """
         insert_user_data_query = """
-        INSERT INTO users (id, email, hashed_password, created_at)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO users (email, hashed_password, created_at)
+        VALUES (?, ?, ?)
         """
         try:
             if self.conn:
@@ -79,7 +79,6 @@ class UserDatabase:
                     cursor.execute(
                         insert_user_data_query,
                         (
-                            str(user.id),
                             user.email,
                             user.hashed_password,
                             user.created_at.isoformat(),

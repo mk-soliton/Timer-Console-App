@@ -1,5 +1,5 @@
 """
-config.py
+config.py module.
 
 This module generates a secret key for JWT token
 """

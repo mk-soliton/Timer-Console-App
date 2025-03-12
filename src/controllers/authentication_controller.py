@@ -1,10 +1,8 @@
 """
-Handle Authentication Service.
+Handle Authentication Controller.
 
-This module handles the authentication logic for the Time Tracker Console
-Application.
-It includes functions for user account creation, login, and secure password
-management.
+This module contains UI for user authentication operations. And also
+validates and processes user authentication requests.
 """
 
 from typing import Optional
@@ -30,11 +28,19 @@ class AuthenticationController:
     def __init__(
         self, auth_service: Optional[AuthenticationService] = None
     ) -> None:
+        """Initialize the AuthenticationController.
+
+        Args:
+            auth_service (Optional[AuthenticationService], optional):
+            Instance of AuthenticationService. Defaults to None.
+        """
         self.console = Console()
         self.auth_service = auth_service or AuthenticationService()
 
     def register_user(self) -> None:
         """
+        User registration handler.
+
         Handle user registration by collecting email and password.
         """
         questions = [
@@ -81,6 +87,8 @@ class AuthenticationController:
 
     def login_user(self):
         """
+        User login handler.
+
         Handle user login by collecting email and password.
         """
         questions = [

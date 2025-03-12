@@ -1,5 +1,5 @@
 """
-logger.py
+logger.py module.
 
 This module provides logging functionality for the Time Tracker Console
 Application.

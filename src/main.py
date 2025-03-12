@@ -1,5 +1,5 @@
 """
-main.py
+main.py module.
 
 This module is the entry point for Time Tracker Console Application.
 """
@@ -15,7 +15,7 @@ console = Console()
 
 
 def main() -> None:
-    """Main function to handle authentication and task management."""
+    """Run main function to handle authentication and task management."""
     auth_controller = AuthenticationController()
     logged_in_user = None
 

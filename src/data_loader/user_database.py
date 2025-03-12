@@ -1,5 +1,5 @@
 """
-user_database.py
+user_database.py module.
 
 This module handles database operations for the User model.
 """
@@ -34,7 +34,12 @@ class UserDatabase:
         self.create_users_table()
 
     def connect(self) -> None:
-        """Establish a connection to the SQLite database."""
+        """
+        Connects to the SQLite database.
+
+        Establish a connection to the SQLite database and handle errors,
+        if any.
+        """
         try:
             self.conn = sqlite3.connect(self.db_path)
             self.conn.row_factory = sqlite3.Row
@@ -42,7 +47,12 @@ class UserDatabase:
             raise Exception(f"Error connecting to database: {err}")
 
     def create_users_table(self) -> None:
-        """Create the users table if it does not already exist."""
+        """
+        Creates users table.
+
+        Create the users table if it does not already exist and handle errors,
+        if any.
+        """
         create_table_query = """
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -63,7 +73,10 @@ class UserDatabase:
             raise Exception(f"Error creating users table: {err}")
 
     def save_user(self, user: User) -> None:
-        """Save a new user to the database.
+        """
+        Saves user data.
+
+        Save a new user to the database and handle errors, if any.
 
         Args:
             user (User): The user object to be saved.
@@ -91,7 +104,10 @@ class UserDatabase:
             raise Exception(f"Error saving user: {err}")
 
     def get_user_by_email(self, email: EmailStr) -> Optional[User]:
-        """Retrieve a user by email.
+        """
+        Retrieves user by email.
+
+        Retrieve a user by email from the database and handle errors, if any.
 
         Args:
             email (EmailStr): The validated email of the user.

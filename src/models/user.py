@@ -12,8 +12,7 @@ from pydantic import BaseModel, EmailStr
 
 
 class User(BaseModel):
-    """Represent a user model in the application using Pydantic for
-    validation."""
+    """Represent a user model using Pydantic for validation."""
 
     id: Optional[int] = None
     email: EmailStr
@@ -23,7 +22,7 @@ class User(BaseModel):
     @classmethod
     def create(cls, email: EmailStr, hashed_password: str) -> "User":
         """
-        Create new user.
+        Creates new user.
 
         Creates a new User instance with a unique UUID, email, hashed password
         and created_at timing.

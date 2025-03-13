@@ -14,6 +14,7 @@ from rich.panel import Panel
 from src.controllers.time_tracker_controller import TimeTrackerController
 from src.services.category_service import CategoryService
 from src.services.task_service import TaskService
+from src.utils.helpers import clear_console
 
 
 class TaskController:
@@ -79,7 +80,8 @@ class TaskController:
         else:
             self.console.print("[yellow]No recent tasks.[/yellow]")
 
-        return self.show_task_menu()
+        # Return to the main loop after displaying the dashboard
+        return None
 
     def show_task_menu(self) -> Optional[str]:
         """Display the task management menu with dynamic options.
@@ -99,9 +101,8 @@ class TaskController:
                 )
                 for task in tasks
             ],
-            ("Back", "back"),
+            ("Logout", "logout"),
         ]
-
         questions = [
             inquirer.List(
                 "task",
@@ -110,37 +111,68 @@ class TaskController:
             )
         ]
         answers = inquirer.prompt(questions)
+        clear_console()
         if not answers:
             return None
 
         selected_task_id = answers["task"]
         if selected_task_id == "create":
-            self.create_task()  # Fix: Ensure create_task is defined
+            self.create_task()
         elif selected_task_id == "logout":
-            return "logout"  # Go back to the dashboard
+            return "logout"
         else:
             self.handle_task_options(int(selected_task_id))
-
         return None
 
     def create_task(self) -> None:
         """Handle the creation of a new task."""
-        questions = [
-            inquirer.Text("category", message="Enter category"),
+        clear_console()
+        categories = [
+            "Billable",
+            "Non-billable",
+            "Meeting",
+            "Personal",
+            "Training",
+            "Create a new category",
+        ]
+
+        category_question = [
+            inquirer.List(
+                "category",
+                message="Choose a category or create one",
+                choices=categories,
+            )
+        ]
+        category_answer = inquirer.prompt(category_question)
+        if not category_answer:
+            return
+
+        category_name = category_answer["category"]
+        if category_name == "Create a new category":
+            new_category_question = [
+                inquirer.Text(
+                    "new_category", message="Enter new category name"
+                )
+            ]
+            new_category_answer = inquirer.prompt(new_category_question)
+            if not new_category_answer:
+                return
+            category_name = new_category_answer["new_category"]
+
+        task_questions = [
             inquirer.Text("task_name", message="Enter task/activity name"),
             inquirer.Text(
                 "duration", message="Enter duration (in hours)", default="0"
             ),
         ]
-        answers = inquirer.prompt(questions)
-        if not answers:
+        task_answers = inquirer.prompt(task_questions)
+        if not task_answers:
             return
 
-        category_name = answers["category"]
-        task_name = answers["task_name"]
+        task_name = task_answers["task_name"]
 
         try:
-            duration = float(answers["duration"])
+            duration = float(task_answers["duration"])
         except ValueError:
             duration = 0.0
 
@@ -153,12 +185,15 @@ class TaskController:
             )
             return
 
-        task = self.task_service.create_task(
-            self.user_id, category_obj.name, task_name, duration
-        )
-        self.console.print(
-            f"[green]Task created successfully with ID: {task.id}[/green]"
-        )
+        try:
+            task = self.task_service.create_task(
+                self.user_id, category_obj.name, task_name, duration
+            )
+            self.console.print(
+                f"[green]Task created successfully with ID: {task.id}[/green]"
+            )
+        except ValueError as err:
+            self.console.print(f"[red]{err}[/red]")
 
     def handle_task_options(self, task_id: int) -> Optional[str]:
         """Handle the options for a selected task.
@@ -169,6 +204,7 @@ class TaskController:
         Returns:
             Optional[str]: The action to take after handling the task options.
         """
+        clear_console()
         task = self.task_service.get_task_by_id(self.user_id, task_id)
         if not task:
             self.console.print("[red]Task not found.[/red]")
@@ -182,14 +218,14 @@ class TaskController:
         )
 
         if task.task_status == "Not Started":
-            options = ["Start Task", "Update Task", "Delete Task", "Log Out"]
+            options = ["Start Task", "Update Task", "Delete Task", "Back"]
         elif task.task_status == "In Progress":
             options = [
                 "Pause Task",
                 "Stop Task",
                 "Update Task",
                 "Delete Task",
-                "Log Out",
+                "Back",
             ]
         elif task.task_status == "Paused":
             options = [
@@ -197,10 +233,10 @@ class TaskController:
                 "Stop Task",
                 "Update Task",
                 "Delete Task",
-                "Log Out",
+                "Back",
             ]
         elif task.task_status == "Completed":
-            options = ["Edit Timing", "Update Task", "Delete Task", "Log Out"]
+            options = ["Edit Timing", "Update Task", "Delete Task", "Back"]
         else:
             options = []
 
@@ -243,8 +279,8 @@ class TaskController:
                 "[yellow]Edit Timing feature is under development.[/yellow]"
             )
             self.show_dashboard()
-        elif action == "Log Out":
-            return "logout"
+        elif action == "Back":
+            self.show_dashboard()
         return None
 
     def update_task(self, task_id: int) -> None:
@@ -274,10 +310,13 @@ class TaskController:
         except ValueError:
             duration = 0.0
 
-        self.task_service.update_task(
-            self.user_id, task_id, category_name, task_name, duration
-        )
-        self.console.print("[green]Task updated successfully.[/green]")
+        try:
+            self.task_service.update_task(
+                self.user_id, task_id, category_name, task_name, duration
+            )
+            self.console.print("[green]Task updated successfully.[/green]")
+        except ValueError as err:
+            self.console.print(f"[red]{err}[/red]")
 
     def delete_task(self, task_id: int) -> None:
         """Delete an existing task.
@@ -286,4 +325,5 @@ class TaskController:
             task_id (int): The ID of the task to delete.
         """
         self.task_service.delete_task(self.user_id, task_id)
+        clear_console()
         self.console.print("[green]Task deleted successfully.[/green]")

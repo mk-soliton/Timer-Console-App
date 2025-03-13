@@ -24,39 +24,81 @@ class TaskController:
         self.category_service = category_service
         self.console = Console()
 
-    def show_menu(self) -> None:
-        while True:
-            self.console.print("\n[cyan]Task Management Menu:[/cyan]")
-            questions = [
-                inquirer.List(
-                    "action",
-                    message="Select an action:",
-                    choices=[
-                        "View Tasks",
-                        "Create Task",
-                        "Delete Task",
-                        "Update Task",
-                        "Log out",
-                    ],
-                )
-            ]
-            answers = inquirer.prompt(questions)
-            if not answers:
-                break
-            if answers["action"] == "View Tasks":
-                self.view_tasks()
-            elif answers["action"] == "Create Task":
-                self.create_task()
-            elif answers["action"] == "Update Task":
+    def show_dashboard(self) -> Optional[str]:
+        """Display the updated dashboard with current and recent tasks.
+
+        Returns:
+            Optional[str]: The action to take after displaying the dashboard.
+        """
+        tasks = self.task_service.get_tasks(self.user_id)
+        current_tasks = [
+            task
+            for task in tasks
+            if task.task_status in ["In Progress", "Paused"]
+        ]
+        recent_tasks = [
+            task for task in tasks if task.task_status == "Completed"
+        ]
+
+        self.console.print(
+            Panel.fit("[bold magenta]Current Tasks[/bold magenta]")
+        )
+        if current_tasks:
+            for task in current_tasks:
                 self.console.print(
-                    "[yellow]Update feature implementation is in progress."
-                    "[/yellow]"
+                    f"[cyan]Status: {task.task_status}[/cyan] | "
+                    f"Task: {task.task_name} | "
+                    f"Category: {task.category_name}"
                 )
-                # self.update_task()
-            elif answers["action"] == "Delete Task":
-                self.delete_task()
-            elif answers["action"] == "Log out":
-                break
+        else:
+            self.console.print("[yellow]No current tasks.[/yellow]")
+
+        self.console.print(
+            Panel.fit("[bold magenta]Recent Tasks[/bold magenta]")
+        )
+        if recent_tasks:
+            for task in recent_tasks:
+                self.console.print(
+                    f"[cyan]Status: {task.task_status}[/cyan] | "
+                    f"Task: {task.task_name} | "
+                    f"Category: {task.category_name}"
+                )
+        else:
+            self.console.print("[yellow]No recent tasks.[/yellow]")
+
+        return self.show_task_menu()
+
+    def show_task_menu(self) -> Optional[str]:
+        """Display the task management menu with dynamic options.
+
+        Returns:
+            Optional[str]: The action to take after displaying the task menu.
+        """
+        tasks = self.task_service.get_tasks(self.user_id)
+        task_choices = [
+            ("Create New Task", "create"),
+            *[
+                (
+                    f"Status: {task.task_status} | "
+                    f"Task: {task.task_name} | "
+                    f"Category: {task.category_name}",
+                    task.id,
+                )
+                for task in tasks
+            ],
+            ("Back", "back"),
+        ]
+
+        questions = [
+            inquirer.List(
+                "task",
+                message="Select a task or create a new one:",
+                choices=task_choices,
+            )
+        ]
+        answers = inquirer.prompt(questions)
+        if not answers:
+            return None
 
     def view_tasks(self) -> None:
         tasks = self.task_service.get_tasks(self.user_id)

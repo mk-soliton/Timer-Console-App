@@ -7,7 +7,7 @@ and owner_id.
 
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class Task(BaseModel):
@@ -17,8 +17,14 @@ class Task(BaseModel):
     user_id: int
     category_name: str
     task_name: str
-    duration: float
+    duration: float = 0.0
     task_status: str
+
+    @field_validator("category_name", "task_name", "task_status")
+    def not_empty(cls, value):
+        if not value or value.strip() == "":
+            raise ValueError("Task entities must not be Empty!.")
+        return value
 
     @classmethod
     def create(

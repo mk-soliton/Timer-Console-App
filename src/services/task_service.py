@@ -118,9 +118,18 @@ class TaskService:
             task_name (str): The task name.
             duration (float): The task duration.
         """
-        self.task_db.update_task(
-            user_id, task_id, category_name, task_name, duration
-        )
+        try:
+            if (
+                category_name
+                and category_name.strip()
+                and task_name
+                and task_name.strip()
+            ):
+                self.task_db.update_task(
+                    user_id, task_id, category_name, task_name, duration
+                )
+        except ValueError as err:
+            raise ValueError(err)
 
     def update_task_status(self, task_id: int, status: str) -> None:
         """Update the status of a task.

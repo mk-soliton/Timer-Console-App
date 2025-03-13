@@ -1,9 +1,3 @@
-"""
-main.py module.
-
-This module is the entry point for Time Tracker Console Application.
-"""
-
 import inquirer  # type: ignore
 from rich.console import Console
 from rich.panel import Panel
@@ -14,11 +8,12 @@ from src.services.category_service import CategoryService
 from src.services.task_service import TaskService
 
 # Create a Rich console instance
+
 console = Console()
 
 
 def main() -> None:
-    """Run main function to handle authentication and task management."""
+    """Main function to handle authentication and task management."""
     auth_controller = AuthenticationController()
     task_service = TaskService()
     category_service = CategoryService()
@@ -63,10 +58,11 @@ def main() -> None:
                     continue
 
                 console.print(
-                    "[bold green]Login successful."
-                    f"Welcome, {logged_in_user.email}![/bold green]"
+                    Panel.fit(
+                        f"[green]Logged in as {logged_in_user.email}[/green]",
+                        title="User Dashboard",
+                    )
                 )
-                continue
 
             elif action == "Exit":
                 console.print(
@@ -74,19 +70,23 @@ def main() -> None:
                     "Goodbye![/bold magenta]"
                 )
                 break
-
         else:
-            console.print(
-                Panel.fit(
-                    f"[green]Logged in as {logged_in_user.email}[/green]",
-                    title="User Dashboard",
+            if logged_in_user.id:
+                console.print(
+                    Panel.fit(
+                        f"[green]Logged in as {logged_in_user.email}[/green]",
+                        title="User Dashboard",
+                    )
                 )
-            )
-            task_controller = TaskController(
-                logged_in_user.id, task_service, category_service
-            )
-            task_controller.show_menu()
-            logged_in_user = None  # Logout after task operations
+                task_controller = TaskController(
+                    logged_in_user.id, task_service, category_service
+                )
+                result = task_controller.show_dashboard()
+                if result == "logout":  # Handle log out
+                    logged_in_user = None
+                    console.print(
+                        "[bold magenta]Logged out successfully.[/bold magenta]"
+                    )
 
 
 if __name__ == "__main__":

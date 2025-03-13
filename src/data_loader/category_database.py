@@ -39,7 +39,7 @@ class CategoryDatabase:
         """Creates the categories table if it doesn't exist."""
         create_table_sql = """
         CREATE TABLE IF NOT EXISTS categories (
-            name TEXT PRIMARY KEY
+            name TEXT NOT NULL PRIMARY KEY
         );
         """
         try:

@@ -21,7 +21,18 @@ class Task(BaseModel):
     task_status: str
 
     @field_validator("category_name", "task_name", "task_status")
-    def not_empty(cls, value):
+    def not_empty(cls, value: str) -> str:
+        """Validate that the task entities are not empty.
+
+        Args:
+            value (str): The value to validate.
+
+        Raises:
+            ValueError: If the value is empty.
+
+        Returns:
+            str: The value if it is not empty.
+        """
         if not value or value.strip() == "":
             raise ValueError("Task entities must not be Empty!.")
         return value

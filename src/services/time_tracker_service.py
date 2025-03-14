@@ -18,7 +18,7 @@ class TimeTrackerService:
     """Service class for handling time tracking operations."""
 
     def __init__(self, db: Optional[TimeTrackerDatabase] = None) -> None:
-        """Initializes the time tracker service with a database instance."""
+        """Initialize the time tracker service with a database instance."""
         self.db = db if db is not None else TimeTrackerDatabase()
 
     def start_timer(

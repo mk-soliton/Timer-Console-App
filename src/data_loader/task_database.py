@@ -135,7 +135,7 @@ class TaskDatabase:
         task_name: str,
         duration: float,
     ) -> None:
-        """Updates a task by task ID for the given user.
+        """Update a task by task ID for the given user.
 
         Args:
             user_id (int): The ID of the user.

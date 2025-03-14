@@ -28,7 +28,7 @@ class CategoryDatabase:
         self.create_categories_table()
 
     def connect(self) -> None:
-        """Establishes a connection to the database."""
+        """Establish a connection to the database."""
         try:
             self.conn = sqlite3.connect(self.db_path)
             self.conn.row_factory = sqlite3.Row
@@ -36,7 +36,7 @@ class CategoryDatabase:
             raise Exception(f"Error connecting to database: {e}")
 
     def create_categories_table(self) -> None:
-        """Creates the categories table if it doesn't exist."""
+        """Create the categories table if it doesn't exist."""
         create_table_sql = """
         CREATE TABLE IF NOT EXISTS categories (
             name TEXT NOT NULL PRIMARY KEY
@@ -51,7 +51,7 @@ class CategoryDatabase:
             raise Exception(f"Error creating categories table: {e}")
 
     def get_or_create_category(self, name: str) -> Category:
-        """Retrieves a category by name, or creates it if it doesn't exist.
+        """Retrieve a category by name, or creates it if it doesn't exist.
 
         Args:
             name (str): The name of the category.

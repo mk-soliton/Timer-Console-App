@@ -28,7 +28,7 @@ class TimeTrackerDatabase:
         self.create_time_trackers_table()
 
     def connect(self) -> None:
-        """Establishes a connection to the database."""
+        """Establish a connection to the database."""
         try:
             self.conn = sqlite3.connect(self.db_path)
             self.conn.row_factory = sqlite3.Row
@@ -36,7 +36,7 @@ class TimeTrackerDatabase:
             raise Exception(f"Error connecting to database: {e}")
 
     def create_time_trackers_table(self) -> None:
-        """Creates the time trackers table if it doesn't exist."""
+        """Create the time trackers table if it doesn't exist."""
         create_table_sql = """
         CREATE TABLE IF NOT EXISTS time_trackers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -60,7 +60,7 @@ class TimeTrackerDatabase:
             raise Exception(f"Error creating time trackers table: {e}")
 
     def save_time_tracker(self, time_tracker: TimeTracker) -> None:
-        """Saves a new time tracker to the database.
+        """Save a new time tracker to the database.
 
         Args:
             time_tracker (TimeTracker): The time tracker object to save.
@@ -100,7 +100,7 @@ class TimeTrackerDatabase:
             raise Exception(f"Error saving time tracker: {e}")
 
     def get_active_time_tracker(self, task_id: int) -> Optional[TimeTracker]:
-        """Retrieves the active time tracker for a task.
+        """Retrieve the active time tracker for a task.
 
         Args:
             task_id (int): The ID of the task.
@@ -141,7 +141,7 @@ class TimeTrackerDatabase:
         return None
 
     def update_time_tracker(self, time_tracker: TimeTracker) -> None:
-        """Updates a time tracker in the database.
+        """Update a time tracker in the database.
 
         Args:
             time_tracker (TimeTracker): The time tracker object to update.

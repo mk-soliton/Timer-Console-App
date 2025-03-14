@@ -15,7 +15,7 @@ console = Console()
 
 
 def main() -> None:
-    """Main function to handle authentication and task management."""
+    """Run main function to handle authentication and task management."""
     auth_controller = AuthenticationController()
     task_service = TaskService()
     category_service = CategoryService()

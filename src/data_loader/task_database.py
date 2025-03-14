@@ -2,8 +2,9 @@
 task_database.py module.
 
 This module contains the TaskDatabase class, which is responsible for managing
-tasks in the database. The class provides methods for saving, retrieving,
-updating, and deleting tasks from the database.
+tasks in the database.
+The class provides methods for saving, retrieving, updating, and deleting tasks
+from the database.
 """
 
 import sqlite3
@@ -58,8 +59,7 @@ class TaskDatabase:
             raise Exception(f"Error creating tasks table: {e}")
 
     def save_task(self, task: Task) -> Optional[Task]:
-        """
-        Save a new task into the database.
+        """Save a new task into the database.
 
         Args:
             task (Task): The task to be saved.
@@ -148,16 +148,15 @@ class TaskDatabase:
             Exception: When an error occurs while updating the task.
             Exception: When the task ID is invalid or non-existing.
         """
-        check_sql = "SELECT COUNT(*) FROM tasks WHERE id = ? AND user_id = ?"
+        check_sql = "SELECT COUNT() FROM tasks WHERE id = ? AND user_id = ?"
         update_sql = """
-        UPDATE tasks SET category_name = ?, task_name = ?, duration = ?
+        UPDATE tasks
+        SET category_name = ?, task_name = ?, duration = ?
         WHERE id = ? AND user_id = ?
         """
-
         try:
             if self.conn:
                 cursor = self.conn.cursor()
-
                 # Check if task exists
                 cursor.execute(check_sql, (task_id, user_id))
                 count = cursor.fetchone()[0]
@@ -165,7 +164,6 @@ class TaskDatabase:
                     raise Exception(
                         f"No task found with ID {task_id} for user {user_id}."
                     )
-
                 # Proceed with the update
                 cursor.execute(
                     update_sql,
@@ -205,13 +203,11 @@ class TaskDatabase:
             Exception: When an error occurs while deleting the task.
             Exception: When the task ID is invalid or non-existing.
         """
-        check_sql = "SELECT COUNT(*) FROM tasks WHERE id = ? AND user_id = ?"
+        check_sql = "SELECT COUNT() FROM tasks WHERE id = ? AND user_id = ?"
         delete_sql = "DELETE FROM tasks WHERE id = ? AND user_id = ?"
-
         try:
             if self.conn:
                 cursor = self.conn.cursor()
-
                 # Check if task exists
                 cursor.execute(check_sql, (task_id, user_id))
                 count = cursor.fetchone()[0]
@@ -219,7 +215,6 @@ class TaskDatabase:
                     raise Exception(
                         f"No task found with ID {task_id} for user {user_id}."
                     )
-
                 # Proceed with deletion
                 cursor.execute(delete_sql, (task_id, user_id))
                 self.conn.commit()

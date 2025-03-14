@@ -14,6 +14,7 @@ from rich.panel import Panel
 from src.models.time_tracker import TimeTracker
 from src.services.report_service import ReportService
 from src.services.task_service import TaskService
+from src.utils.helpers import clear_console
 
 
 class ReportController:
@@ -33,6 +34,7 @@ class ReportController:
         self, report_type: str, duration: Optional[int] = None
     ) -> None:
         """Generate a report based on the specified type and duration."""
+        clear_console()
         if report_type == "overall":
             self._generate_overall_report()
         elif report_type == "daily":
@@ -47,11 +49,16 @@ class ReportController:
             if duration:
                 self._generate_custom_report(duration)
             else:
-                self.console.print(
-                    "[red]Please specify a duration for the custom report.[/red]"
-                )
+                self.console.print("[red]Invalid duration specified.[/red]")
         else:
             self.console.print("[red]Invalid report type.[/red]")
+
+        # Wait for user input before returning to the dashboard
+        self.console.print(
+            "\n[bold magenta]Press Enter to return to the dashboard..."
+            "[/bold magenta]"
+        )
+        input()
 
     def _generate_overall_report(self) -> None:
         """Generate an overall report."""
@@ -104,13 +111,16 @@ class ReportController:
 
     def _generate_custom_report(self, duration: int) -> None:
         """Generate a custom duration report."""
-        start_date = datetime.now().date() - timedelta(days=duration)
-        time_trackers = (
-            self.report_service.get_time_trackers_by_user_and_date_range(
-                self.user_id, start_date, datetime.now().date()
+        if duration <= 0 or not str(duration).isdigit():
+            self.console.print("[red]Invalid duration specified.[/red]")
+        else:
+            start_date = datetime.now().date() - timedelta(days=duration)
+            time_trackers = (
+                self.report_service.get_time_trackers_by_user_and_date_range(
+                    self.user_id, start_date, datetime.now().date()
+                )
             )
-        )
-        self._display_insights(time_trackers)
+            self._display_insights(time_trackers)
 
     def _display_insights(self, time_trackers: List[TimeTracker]) -> None:
         """Display insights based on time trackers."""
@@ -140,13 +150,16 @@ class ReportController:
                 categories.keys(), key=lambda k: categories[k]
             )
             self.console.print(
-                f"[cyan]Most time spent on: {most_time_category} ({categories[most_time_category]:.2f} seconds)[/cyan]"
+                f"[cyan]Most time spent on: {most_time_category} "
+                f"({categories[most_time_category]:.2f} seconds)[/cyan]"
             )
             self.console.print(
-                f"[cyan]Least time spent on: {least_time_category} ({categories[least_time_category]:.2f} seconds)[/cyan]"
+                f"[cyan]Least time spent on: {least_time_category} "
+                f"({categories[least_time_category]:.2f} seconds)[/cyan]"
             )
             self.console.print(
-                f"[cyan]Frequent categories: {', '.join(categories.keys())}[/cyan]"
+                f"[cyan]Frequent categories: {', '.join(categories.keys())}"
+                "[/cyan]"
             )
         else:
             self.console.print("[yellow]No category data available.[/yellow]")
@@ -157,7 +170,8 @@ class ReportController:
         )
         for insight in task_insights:
             self.console.print(
-                f"[cyan]Task {insight['task_id']}: {insight['task_name']} ({insight['category']})[/cyan]"
+                f"[cyan]Task {insight['task_id']}: {insight['task_name']} "
+                f"({insight['category']})[/cyan]"
             )
             self.console.print(f"  - Start Time: {insight['start_time']}")
             self.console.print(f"  - Stop Time: {insight['stop_time']}")
@@ -165,7 +179,8 @@ class ReportController:
                 f"  - Total Time: {insight['total_time']:.2f} seconds"
             )
             self.console.print(
-                f"  - Estimated Duration: {insight['estimated_duration']:.2f} seconds"
+                f"  - Estimated Duration: {insight['estimated_duration']:.2f} "
+                "seconds"
             )
             self.console.print(f"  - Status: {insight['status']}")
             duration_insight = self.report_service.get_task_duration_insights(

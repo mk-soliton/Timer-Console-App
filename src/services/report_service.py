@@ -115,7 +115,7 @@ class ReportService:
         task_insights = []
         for tracker in time_trackers:
             task = self.task_service.get_task_by_id(
-                tracker.task_id, user_id
+                user_id, tracker.task_id
             )  # Pass user_id explicitly
             if task:
                 task_insights.append(

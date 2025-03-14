@@ -65,7 +65,7 @@ class TaskController:
                 self.console.print(
                     f"[cyan]Status: {task.task_status}[/cyan] | "
                     f"Task: {task.task_name} | "
-                    f"Category: {task.category_name}"
+                    f"Category: {task.category_name} | "
                 )
         else:
             self.console.print("[yellow]No current tasks.[/yellow]")
@@ -98,7 +98,8 @@ class TaskController:
                 (
                     f"Status: {task.task_status} | "
                     f"Task: {task.task_name} | "
-                    f"Category: {task.category_name}",
+                    f"Category: {task.category_name} | "
+                    f"Estimated duration: {task.duration}s",
                     task.id,
                 )
                 for task in tasks
@@ -114,7 +115,6 @@ class TaskController:
             )
         ]
         answers = inquirer.prompt(questions)
-        clear_console()
         if not answers:
             return None
         selected_task_id = answers["task"]
@@ -135,12 +135,15 @@ class TaskController:
                 "report_type",
                 message="Select a report type:",
                 choices=[
-                    "Overall",
-                    "Daily",
-                    "Weekly",
-                    "Monthly",
-                    "Category-wise",
-                    "Custom",
+                    ("Overall", "overall"),
+                    ("Daily", "daily"),
+                    ("Weekly", "weekly"),
+                    ("Monthly", "monthly"),
+                    (
+                        "Category-wise",
+                        "category",
+                    ),  # Map "Category-wise" to "category"
+                    ("Custom", "custom"),
                 ],
             ),
         ]
@@ -220,6 +223,11 @@ class TaskController:
                 f"[red]Failed to create/retrieve category '{category_name}'"
                 "[/red]"
             )
+            self.console.print(
+                "\n[bold magenta]Press Enter to return to the dashboard..."
+                "[/bold magenta]"
+            )
+            input()
             return
 
         try:
@@ -232,6 +240,12 @@ class TaskController:
         except ValueError as err:
             self.console.print(f"[red]{err}[/red]")
 
+        self.console.print(
+            "\n[bold magenta]Press Enter to return to the dashboard..."
+            "[/bold magenta]"
+        )
+        input()
+
     def handle_task_options(self, task_id: int) -> Optional[str]:
         """Handle the options for a selected task.
 
@@ -241,7 +255,6 @@ class TaskController:
         Returns:
             Optional[str]: The action to take after handling the task options.
         """
-        clear_console()
         task = self.task_service.get_task_by_id(self.user_id, task_id)
         if not task:
             self.console.print("[red]Task not found.[/red]")
@@ -315,12 +328,11 @@ class TaskController:
             self.delete_task(task_id)
             self.show_dashboard()
         elif action == "Edit Timing":
-            self.console.print(
-                "[yellow]Edit Timing feature is under development.[/yellow]"
-            )
+            self.update_task_timings(task_id)
             self.show_dashboard()
         elif action == "Back":
             self.show_dashboard()
+        clear_console()
         return None
 
     def update_task_timings(self, task_id: int) -> None:
@@ -351,6 +363,11 @@ class TaskController:
                 "[red]Invalid date format. "
                 "Please use YYYY-MM-DD HH:MM:SS.[/red]"
             )
+            self.console.print(
+                "\n[bold magenta]Press Enter to return to the dashboard..."
+                "[/bold magenta]"
+            )
+            input()
             return
 
         time_tracker = TimeTrackerController(
@@ -359,6 +376,12 @@ class TaskController:
         time_tracker.update_time_tracker(
             start_time=start_time, stop_time=stop_time
         )
+
+        self.console.print(
+            "\n[bold magenta]Press Enter to return to the dashboard..."
+            "[/bold magenta]"
+        )
+        input()
 
     def update_task(self, task_id: int) -> None:
         """Update an existing task.
@@ -376,6 +399,7 @@ class TaskController:
             ),
         ]
         answers = inquirer.prompt(questions)
+        clear_console()
         if not answers:
             return
 
@@ -394,6 +418,12 @@ class TaskController:
         except ValueError as err:
             self.console.print(f"[red]{err}[/red]")
 
+        self.console.print(
+            "\n[bold magenta]Press Enter to return to the dashboard..."
+            "[/bold magenta]"
+        )
+        input()
+
     def delete_task(self, task_id: int) -> None:
         """Delete an existing task.
 
@@ -403,3 +433,8 @@ class TaskController:
         self.task_service.delete_task(self.user_id, task_id)
         clear_console()
         self.console.print("[green]Task deleted successfully.[/green]")
+        self.console.print(
+            "\n[bold magenta]Press Enter to return to the dashboard..."
+            "[/bold magenta]"
+        )
+        input()

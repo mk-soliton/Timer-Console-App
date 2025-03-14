@@ -26,21 +26,29 @@ class TimeTrackerService:
         """
         self.db = db if db is not None else TimeTrackerDatabase()
 
-    def start_timer(
-        self, task_id: int, category: str, task: str
-    ) -> TimeTracker:
+    def get_active_time_tracker(self, task_id: int) -> Optional[TimeTracker]:
+        """Retrieve the active time tracker for a task.
+
+        Args:
+            task_id (int): The task ID.
+
+        Returns:
+            Optional[TimeTracker]: The active time tracker instance.
+        """
+        return self.db.get_active_time_tracker(task_id)
+
+    def start_timer(self, task_id: int, category: str) -> TimeTracker:
         """Start the timer for a task.
 
         Args:
             task_id (int): The task ID.
-            category (str): The category of the task.
-            task (str): The task description.
+            category (str): The task category.
 
         Returns:
-            TimeTracker: The time tracker object.
+            TimeTracker: The time tracker instance.
         """
         time_tracker = TimeTracker.create(
-            task_id=task_id, category=category, task=task, status="In Progress"
+            task_id=task_id, status="In Progress", category=category
         )
         time_tracker.start_time = datetime.now()
         self.db.save_time_tracker(time_tracker)
@@ -115,14 +123,3 @@ class TimeTrackerService:
             self.db.save_time_tracker(active_tracker)
             return active_tracker
         return None
-
-    def get_task_timings(self, task_id: int) -> Optional[TimeTracker]:
-        """Retrieve the timings for a specific task.
-
-        Args:
-            task_id (int): The task ID.
-
-        Returns:
-            Optional[TimeTracker]: The time tracker object.
-        """
-        return self.db.get_active_time_tracker(task_id)

@@ -5,12 +5,14 @@ This module contains the TaskController class which is responsible for handling
 task management operations like creating, updating, and deleting tasks.
 """
 
+from datetime import datetime
 from typing import Optional
 
 import inquirer  # type: ignore
 from rich.console import Console
 from rich.panel import Panel
 
+from src.controllers.report_controller import ReportController
 from src.controllers.time_tracker_controller import TimeTrackerController
 from src.services.category_service import CategoryService
 from src.services.task_service import TaskService
@@ -26,10 +28,11 @@ class TaskController:
         task_service: TaskService,
         category_service: CategoryService,
     ) -> None:
-        """Initialize the TaskController.
+        """Initialize the TaskController with user ID, task service, and
+        category service.
 
         Args:
-            user_id (int): The ID of the logged-in user.
+            user_id (int): The ID of the user.
             task_service (TaskService): The task service instance.
             category_service (CategoryService): The category service instance.
         """
@@ -80,7 +83,6 @@ class TaskController:
         else:
             self.console.print("[yellow]No recent tasks.[/yellow]")
 
-        # Return to the main loop after displaying the dashboard
         return None
 
     def show_task_menu(self) -> Optional[str]:
@@ -101,6 +103,7 @@ class TaskController:
                 )
                 for task in tasks
             ],
+            ("Generate Report", "report"),
             ("Logout", "logout"),
         ]
         questions = [
@@ -114,15 +117,52 @@ class TaskController:
         clear_console()
         if not answers:
             return None
-
         selected_task_id = answers["task"]
         if selected_task_id == "create":
             self.create_task()
+        elif selected_task_id == "report":
+            self.generate_report()
         elif selected_task_id == "logout":
             return "logout"
         else:
             self.handle_task_options(int(selected_task_id))
         return None
+
+    def generate_report(self) -> None:
+        """Generate a report based on user input."""
+        questions = [
+            inquirer.List(
+                "report_type",
+                message="Select a report type:",
+                choices=[
+                    "Overall",
+                    "Daily",
+                    "Weekly",
+                    "Monthly",
+                    "Category-wise",
+                    "Custom",
+                ],
+            ),
+        ]
+        answers = inquirer.prompt(questions)
+        if not answers:
+            return
+
+        report_type = answers["report_type"].lower()
+        duration = None
+        if report_type == "custom":
+            duration_question = [
+                inquirer.Text("duration", message="Enter the number of days:")
+            ]
+            duration_answer = inquirer.prompt(duration_question)
+            if not duration_answer:
+                return
+            duration = int(duration_answer["duration"])
+
+        report_controller = ReportController(
+            user_id=self.user_id, task_service=self.task_service
+        )
+        report_controller.generate_report(report_type, duration)
 
     def create_task(self) -> None:
         """Handle the creation of a new task."""
@@ -135,7 +175,6 @@ class TaskController:
             "Training",
             "Create a new category",
         ]
-
         category_question = [
             inquirer.List(
                 "category",
@@ -170,14 +209,12 @@ class TaskController:
             return
 
         task_name = task_answers["task_name"]
-
         try:
             duration = float(task_answers["duration"])
         except ValueError:
             duration = 0.0
 
         category_obj = self.category_service.create_category(category_name)
-
         if not category_obj or not hasattr(category_obj, "name"):
             self.console.print(
                 f"[red]Failed to create/retrieve category '{category_name}'"
@@ -199,7 +236,7 @@ class TaskController:
         """Handle the options for a selected task.
 
         Args:
-            task_id (int): The ID of the selected task.
+            task_id (int): The ID of the task to handle.
 
         Returns:
             Optional[str]: The action to take after handling the task options.
@@ -211,10 +248,7 @@ class TaskController:
             return None
 
         time_tracker = TimeTrackerController(
-            user_id=self.user_id,
-            task_id=task_id,
-            category=task.category_name,
-            task=task.task_name,
+            user_id=self.user_id, task_id=task_id
         )
 
         if task.task_status == "Not Started":
@@ -242,9 +276,7 @@ class TaskController:
 
         questions = [
             inquirer.List(
-                "action",
-                message="Select an action:",
-                choices=options,
+                "action", message="Select an action:", choices=options
             )
         ]
         answers = inquirer.prompt(questions)
@@ -253,7 +285,11 @@ class TaskController:
 
         action = answers["action"]
         if action == "Start Task":
-            time_tracker.start_timer()
+            # Get the category for the task
+            category = (
+                task.category_name
+            )  # Assuming the task has a `category_name` attribute
+            time_tracker.start_timer(category)
             self.task_service.update_task_status(task_id, "In Progress")
             self.show_dashboard()
         elif action == "Pause Task":
@@ -261,7 +297,11 @@ class TaskController:
             self.task_service.update_task_status(task_id, "Paused")
             self.show_dashboard()
         elif action == "Resume Task":
-            time_tracker.resume_timer()
+            # Get the category for the task
+            category = (
+                task.category_name
+            )  # Assuming the task has a `category_name` attribute
+            time_tracker.resume_timer(category)
             self.task_service.update_task_status(task_id, "In Progress")
             self.show_dashboard()
         elif action == "Stop Task":
@@ -282,6 +322,43 @@ class TaskController:
         elif action == "Back":
             self.show_dashboard()
         return None
+
+    def update_task_timings(self, task_id: int) -> None:
+        """Update the start and stop timings of a task."""
+        questions = [
+            inquirer.Text(
+                "start_time",
+                message="Enter new start time (YYYY-MM-DD HH:MM:SS):",
+            ),
+            inquirer.Text(
+                "stop_time",
+                message="Enter new stop time (YYYY-MM-DD HH:MM:SS):",
+            ),
+        ]
+        answers = inquirer.prompt(questions)
+        if not answers:
+            return
+
+        try:
+            start_time = datetime.strptime(
+                answers["start_time"], "%Y-%m-%d %H:%M:%S"
+            )
+            stop_time = datetime.strptime(
+                answers["stop_time"], "%Y-%m-%d %H:%M:%S"
+            )
+        except ValueError:
+            self.console.print(
+                "[red]Invalid date format. "
+                "Please use YYYY-MM-DD HH:MM:SS.[/red]"
+            )
+            return
+
+        time_tracker = TimeTrackerController(
+            user_id=self.user_id, task_id=task_id
+        )
+        time_tracker.update_time_tracker(
+            start_time=start_time, stop_time=stop_time
+        )
 
     def update_task(self, task_id: int) -> None:
         """Update an existing task.
@@ -304,7 +381,6 @@ class TaskController:
 
         category_name = answers["category"]
         task_name = answers["task_name"]
-
         try:
             duration = float(answers["duration"])
         except ValueError:

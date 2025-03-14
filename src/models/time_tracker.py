@@ -12,34 +12,26 @@ from pydantic import BaseModel
 
 
 class TimeTracker(BaseModel):
-    """Represents a time tracker model for tracking task timings."""
+    """Represent a time tracker model for tracking task timings."""
 
     id: Optional[int] = None
-    task_id: int  # Foreign key to the task
+    task_id: int
     category: str
-    task: str
-    status: str
     start_time: Optional[datetime] = None
-    pause_time: Optional[datetime] = None
-    resume_time: Optional[datetime] = None
     stop_time: Optional[datetime] = None
+    status: str
     total_time: float = 0.0
 
     @classmethod
-    def create(
-        cls, task_id: int, category: str, task: str, status: str
-    ) -> "TimeTracker":
+    def create(cls, task_id: int, status: str, category: str) -> "TimeTracker":
         """Create a new TimeTracker instance.
 
         Args:
-            task_id (int): The task's unique identifier.
-            category (str): The task's category.
-            task (str): The task name.
-            status (str): The task status.
+            task_id (int): Task ID.
+            status (str): Status of the task.
+            category (str): Category of the task.
 
         Returns:
             TimeTracker: A new TimeTracker instance.
         """
-        return cls(
-            task_id=task_id, category=category, task=task, status=status
-        )
+        return cls(task_id=task_id, status=status, category=category)

@@ -1,8 +1,8 @@
 """
 Defines Task model.
 
-This module represents a task model with id, category, task, task_duration,
-and owner_id.
+This module represents a task model with id, category, task, task_duration, and
+owner_id.
 """
 
 from typing import Optional

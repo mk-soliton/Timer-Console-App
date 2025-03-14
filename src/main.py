@@ -44,6 +44,7 @@ def main() -> None:
                 break
 
             action = answers.get("action")
+
             if action == "Register":
                 clear_console()
                 console.print(
@@ -54,6 +55,7 @@ def main() -> None:
                     )
                 )
                 auth_controller.register_user()
+
             elif action == "Login":
                 clear_console()
                 console.print(
@@ -67,10 +69,13 @@ def main() -> None:
                 if result is None:
                     console.print("[red]Login failed. Please try again.[/red]")
                     continue
+
                 token, logged_in_user = result
+
                 if logged_in_user is None:
                     console.print("[red]Login failed. Please try again.[/red]")
                     continue
+
             elif action == "Exit":
                 clear_console()
                 console.print(
@@ -92,8 +97,7 @@ def main() -> None:
                 )
                 task_controller.show_dashboard()  # Show the dashboard once
                 result = task_controller.show_task_menu()  # Show the task menu
-                if result == "logout":
-                    # Handle log out
+                if result == "logout":  # Handle log out
                     logged_in_user = None  # Reset the logged-in user
                     console.print(
                         "[bold magenta]Logged out successfully.[/bold magenta]"

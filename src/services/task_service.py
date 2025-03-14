@@ -1,9 +1,10 @@
 """
 Handles Task CRUD operations.
 
-This module contains the TaskService class, which is responsible for
-managing tasks in the application. It provides methods for creating, reading,
-updating, and deleting tasks, as well as updating task status.
+This module contains the TaskService class, which is responsible for managing
+tasks in the application.
+It provides methods for creating, reading, updating, and deleting tasks, as
+well as updating task status.
 """
 
 from typing import List, Optional
@@ -56,13 +57,11 @@ class TaskService:
             Task: The created task.
         """
         category = self.category_db.get_or_create_category(category_name)
-
         if category is None or "":
             raise ValueError(
                 f"Category '{category_name}' "
                 "could not be created or retrieved."
             )
-
         new_task = Task.create(
             user_id=user_id,
             category_name=category_name,
@@ -70,7 +69,6 @@ class TaskService:
             duration=duration,
             task_status="Not Started",
         )
-
         self.task_db.save_task(new_task)
         return new_task
 

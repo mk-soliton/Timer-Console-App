@@ -2,7 +2,8 @@
 Handle Category Service.
 
 This module handles category management logic for the Time Tracker Console
-Application. It includes functions for creating and retrieving categories.
+Application.
+It includes functions for creating and retrieving categories.
 """
 
 from typing import List, Optional
@@ -18,8 +19,8 @@ class CategoryService:
         """Initialize the category service with a database instance.
 
         Args:
-            db (Optional[CategoryDatabase], optional): The database instance to
-            use. Defaults to None.
+            db (Optional[CategoryDatabase], optional): The database instance
+            to use. Defaults to None.
         """
         self.db = db if db is not None else CategoryDatabase()
 

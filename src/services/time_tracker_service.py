@@ -18,7 +18,12 @@ class TimeTrackerService:
     """Service class for handling time tracking operations."""
 
     def __init__(self, db: Optional[TimeTrackerDatabase] = None) -> None:
-        """Initialize the time tracker service with a database instance."""
+        """Initialize the time tracker service with a database instance.
+
+        Args:
+            db (Optional[TimeTrackerDatabase], optional): A TimeTrackerDatabase
+            instance. If None, a new instance is created. Defaults to None.
+        """
         self.db = db if db is not None else TimeTrackerDatabase()
 
     def start_timer(
@@ -48,67 +53,67 @@ class TimeTrackerService:
             task_id (int): The task ID.
 
         Returns:
-            Optional[TimeTracker]: The time tracker object.
+            Optional[TimeTracker]: The time tracker instance.
         """
-        time_tracker = self.db.get_active_time_tracker(task_id)
+        active_tracker = self.db.get_active_time_tracker(task_id)
         if (
-            time_tracker
-            and time_tracker.start_time
-            and not time_tracker.pause_time
+            active_tracker
+            and active_tracker.start_time
+            and not active_tracker.stop_time
         ):
-            time_tracker.pause_time = datetime.now()
-            time_tracker.status = "Paused"
-            self.db.update_time_tracker(time_tracker)
-            return time_tracker
+            active_tracker.stop_time = datetime.now()
+            active_tracker.status = "Paused"
+            # Calculate total time so far
+            elapsed_time = (
+                active_tracker.stop_time - active_tracker.start_time
+            ).total_seconds()
+            active_tracker.total_time = elapsed_time
+            self.db.save_time_tracker(active_tracker)
+            return active_tracker
         return None
 
-    def resume_timer(self, task_id: int) -> Optional[TimeTracker]:
+    def resume_timer(
+        self, task_id: int, category: str
+    ) -> Optional[TimeTracker]:
         """Resume the timer for a task.
 
         Args:
             task_id (int): The task ID.
+            category (str): The task category.
 
         Returns:
-            Optional[TimeTracker]: The time tracker object.
+            Optional[TimeTracker]: The time tracker instance.
         """
-        time_tracker = self.db.get_active_time_tracker(task_id)
-        if time_tracker and time_tracker.pause_time:
-            time_tracker.resume_time = datetime.now()
-            time_tracker.status = "In Progress"
-            self.db.update_time_tracker(time_tracker)
+        paused_tracker = self.db.get_last_paused_time_tracker(task_id)
+        if paused_tracker:
+            time_tracker = TimeTracker.create(
+                task_id=task_id, status="In Progress", category=category
+            )
+            time_tracker.start_time = datetime.now()
+            self.db.save_time_tracker(time_tracker)
             return time_tracker
         return None
 
     def stop_timer(self, task_id: int) -> Optional[TimeTracker]:
-        """Stop the timer for a task and calculates the total time.
+        """Stop the timer for a task and calculate the total time.
 
         Args:
             task_id (int): The task ID.
 
         Returns:
-            Optional[TimeTracker]: The time tracker object.
+            Optional[TimeTracker]: The time tracker instance.
         """
-        time_tracker = self.db.get_active_time_tracker(task_id)
-        if time_tracker and time_tracker.start_time:
-            time_tracker.stop_time = datetime.now()
-            time_tracker.status = "Completed"
-
+        active_tracker = self.db.get_active_time_tracker(task_id)
+        if active_tracker and active_tracker.start_time:
+            active_tracker.stop_time = datetime.now()
+            active_tracker.status = "Completed"
             # Calculate total time
-            if time_tracker.pause_time and time_tracker.resume_time:
-                total_paused_time = (
-                    time_tracker.resume_time - time_tracker.pause_time
-                ).total_seconds()
-                total_time = (
-                    time_tracker.stop_time - time_tracker.start_time
-                ).total_seconds() - total_paused_time
-            else:
-                total_time = (
-                    time_tracker.stop_time - time_tracker.start_time
-                ).total_seconds()
-
-            time_tracker.total_time = total_time
-            self.db.update_time_tracker(time_tracker)
-            return time_tracker
+            elapsed_time = (
+                active_tracker.stop_time - active_tracker.start_time
+            ).total_seconds()
+            active_tracker.total_time = elapsed_time
+            self.db.save_time_tracker(active_tracker)
+            return active_tracker
         return None
 
     def get_task_timings(self, task_id: int) -> Optional[TimeTracker]:

@@ -2,8 +2,9 @@
 Handle Authentication Service.
 
 This module handles the authentication logic for the Time Tracker Console
-Application. It includes functions for user account creation, login, and secure
-password management.
+Application.
+It includes functions for user account creation, login, and secure password
+management.
 """
 
 from datetime import datetime, timedelta, timezone
@@ -14,7 +15,7 @@ import jwt  # type: ignore
 from pydantic import EmailStr
 
 from src.data_loader.user_database import UserDatabase
-from src.exceptions.authentication_exceptions import (
+from src.exceptions.authentication_exception import (
     AuthenticationError,
     UserAlreadyExistsError,
 )
@@ -26,8 +27,7 @@ class AuthenticationService:
     """Service class for handling user authentication operations."""
 
     def __init__(self, db: Optional[UserDatabase] = None) -> None:
-        """
-        Initialize the authentication service with a database instance.
+        """Initialize the authentication service with a database instance.
 
         Args:
             db (Optional[Database]): A Database instance. If None, a new
@@ -37,8 +37,7 @@ class AuthenticationService:
 
     @staticmethod
     def hash_password(password: str) -> str:
-        """
-        Hash password.
+        """Hash password.
 
         Hash the password provided by the user using bcrypt.
 
@@ -53,8 +52,7 @@ class AuthenticationService:
 
     @staticmethod
     def verify_password(password: str, hashed_password: str) -> bool:
-        """
-        Verify password correctness.
+        """Verify password correctness.
 
         Verify if the provided password matches the stored hashed password.
 
@@ -69,8 +67,7 @@ class AuthenticationService:
 
     @staticmethod
     def generate_token(user_id: str) -> str:
-        """
-        Generate a JWT token.
+        """Generate a JWT token.
 
         Generate JWT authentication token for a user.
 
@@ -90,8 +87,7 @@ class AuthenticationService:
 
     @staticmethod
     def decode_token(token: str) -> Optional[dict]:
-        """
-        Decode JWT token.
+        """Decode JWT token.
 
         Decode and verify a JWT authentication token.
 
@@ -111,21 +107,23 @@ class AuthenticationService:
     @staticmethod
     def is_strong_password(password: str) -> bool:
         """
-        Check password strength.
-
-        Check if the password meets minimum security requirements.
+        Check if the password is strong.
 
         Args:
-            password (str): The plain text password.
+            password (str): The password to check.
 
         Returns:
             bool: True if the password is strong, False otherwise.
         """
-        return len(password) >= 8 and password.isalnum()
+        return (
+            len(password) >= 8
+            and any(character.isupper() for character in password)
+            and any(character.islower() for character in password)
+            and any(character.isdigit() for character in password)
+        )
 
     def register_user(self, email: EmailStr, password: str) -> User:
-        """
-        Register a new user.
+        """Register a new user.
 
         Register new user by storing hashed credentials in the database.
 
@@ -145,22 +143,18 @@ class AuthenticationService:
             raise UserAlreadyExistsError(
                 f"User with email {email} already exists."
             )
-
         if not self.is_strong_password(password):
             raise ValueError(
                 "Password must be at least 8 characters long with"
                 "alpha numeric characters."
             )
-
         hashed_password = self.hash_password(password)
         new_user = User.create(email=email, hashed_password=hashed_password)
         self.db.save_user(new_user)
         return new_user
 
     def login_user(self, email: str, password: str) -> tuple[str, User]:
-        """
-        Login a user.
-
+        """Login a user.
         Authenticate a user and returns a JWT token if successful.
 
         Args:
@@ -172,14 +166,13 @@ class AuthenticationService:
             credentials.
 
         Returns:
-            tuple[str, User]: A JWT token and the user object if
-            authentication is successful.
+            tuple[str, User]: A JWT token and the user object if authentication
+            is successful.
         """
         user = self.db.get_user_by_email(email)
         if not user or not self.verify_password(
             password, user.hashed_password
         ):
             raise AuthenticationError("Invalid credentials")
-
         token = self.generate_token(str(user.id))
         return token, user

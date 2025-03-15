@@ -21,8 +21,8 @@ class UserDatabase:
     """
 
     def __init__(self, db_path: str = "src/database/users.db") -> None:
-        """Initialize the database connection and ensures the users table
-        exists.
+        """Initialize the database connection and ensures the users table \
+exists.
 
         Args:
             db_path (str): Path to the SQLite database file.

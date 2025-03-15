@@ -22,8 +22,8 @@ class ReportService:
         db: Optional[TimeTrackerDatabase] = None,
         task_service: Optional[TaskService] = None,
     ) -> None:
-        """Initialize the report service with a database instance and
-        task service.
+        """Initialize the report service with a database instance and \
+task service.
 
         Args:
             db (Optional[TimeTrackerDatabase], optional): Time tracker database

@@ -2,7 +2,8 @@
 category_database.py module.
 
 This module handles database operations for the Category model that includes
-methods for creating, retrieving, and updating categories."""
+methods for creating, retrieving, and updating categories.
+"""
 
 import sqlite3
 from sqlite3 import Connection, Error

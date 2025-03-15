@@ -20,8 +20,8 @@ class TimeTrackerDatabase:
         db_path: str = "src/database/timings.db",
         tasks_db_path: str = "src/database/tasks.db",
     ) -> None:
-        """Initialize the database connection and ensure the time trackers
-        table exists.
+        """Initialize the database connection and ensure the time trackers \
+table exists.
 
         Args:
             db_path (str, optional): Path to the SQLite database file. Defaults

@@ -28,8 +28,8 @@ class TaskController:
         task_service: TaskService,
         category_service: CategoryService,
     ) -> None:
-        """Initialize the TaskController with user ID, task service, and
-        category service.
+        """Initialize the TaskController with user ID, task service, and \
+category service.
 
         Args:
             user_id (int): The ID of the user.

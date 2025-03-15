@@ -23,6 +23,13 @@ class ReportController:
     def __init__(
         self, user_id: int, task_service: Optional[TaskService] = None
     ) -> None:
+        """Initialize ReportController with user id, and task service.
+
+        Args:
+            user_id (int): The ID of the user.
+            task_service (Optional[TaskService], optional): TaskService
+            instance. Defaults to None.
+        """
         self.user_id = user_id
         self.task_service = (
             task_service if task_service is not None else TaskService()

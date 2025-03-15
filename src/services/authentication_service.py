@@ -155,6 +155,7 @@ class AuthenticationService:
 
     def login_user(self, email: str, password: str) -> tuple[str, User]:
         """Login a user.
+
         Authenticate a user and returns a JWT token if successful.
 
         Args:

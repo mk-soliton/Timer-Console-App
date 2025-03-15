@@ -57,8 +57,8 @@ class CategoryDatabase:
             name (str): The name of the category.
 
         Raises:
-            Exception: When an error occurs while retrieving or
-            creating the category.
+            Exception: When an error occurs while retrieving or creating
+            the category.
             ValueError: When the category cannot be created or retrieved.
 
         Returns:
@@ -75,13 +75,11 @@ class CategoryDatabase:
                     return Category(
                         name=row["name"]
                     )  # Return existing category
-
                 cursor.execute(insert_sql, (name,))
                 self.conn.commit()
                 return Category(name=name)  # Return newly created category
         except Error as e:
             raise Exception(f"Error retrieving or creating category: {e}")
-
         raise ValueError(f"Failed to create or retrieve category '{name}'.")
 
     def get_all_categories(self) -> List[Category]:

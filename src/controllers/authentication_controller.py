@@ -1,8 +1,8 @@
 """
 Handle Authentication Controller.
 
-This module contains UI for user authentication operations. And also
-validates and processes user authentication requests.
+This module contains UI for user authentication operations.
+And also validates and processes user authentication requests.
 """
 
 from typing import Optional

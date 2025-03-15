@@ -15,15 +15,14 @@ from src.models.user import User
 
 
 class UserDatabase:
-    """
-    User database operations.
+    """User database operations.
 
     Database class to handle user storage using SQLite3.
     """
 
     def __init__(self, db_path: str = "src/database/users.db") -> None:
-        """
-        Initialize the database connection and ensures the users table exists.
+        """Initialize the database connection and ensures the users table \
+exists.
 
         Args:
             db_path (str): Path to the SQLite database file.
@@ -131,6 +130,7 @@ class UserDatabase:
                                 row["created_at"]
                             ),
                         )
-            return None
+                    return None
         except Error as err:
             raise Exception(f"Error retrieving user by email: {err}")
+        return None
